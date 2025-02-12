@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="demo" id="counterId">
+    Счетчик: {{ messageText }}
+  </div>
+
+  <div id="textMessageId">
+    <p>{{ messageText }}</p>
+    <button v-on:click = 'reverseMessage'>reverse this message
+    </button>
+  </div>
+  
+  <div id="VModelTest">
+    <p>{{ messageText }}</p>
+    <input v-model="messageText" />
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="/vue/main.js"></script>
+</body>
+</html>
