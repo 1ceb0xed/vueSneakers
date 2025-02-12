@@ -2,6 +2,7 @@
 import { inject } from 'vue'
 import Card from './Card.vue'
 const addToCart = inject('addToCart')
+const searchedItems = inject('searchedItems')
 defineProps({
   items: Array,
 })
@@ -10,7 +11,7 @@ const emit = defineEmits(['addToFavorite'])
 <template>
   <div class="grid grid-cols-4 gap-5 ml-5 mr-5">
     <Card
-      v-for="item in items"
+      v-for="item in searchedItems"
       :key="item.id"
       :id="item.id"
       :price="item.price"

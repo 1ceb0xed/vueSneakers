@@ -9,20 +9,24 @@ const items = ref([])
 const AddedItems = ref([])
 const drawerOpen = ref(false)
 const filter = ref('name')
+const searchQuery = ref('')
 
-const sortedItems = () => {
+const searchedItems = computed(() => {
+  let result = items.value.filter((item) =>
+    item.title.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
+
   switch (filter.value) {
     case 'priceUp':
-      items.value.sort((a, b) => a.price - b.price)
-      break
+      return result.sort((a, b) => a.price - b.price)
     case 'priceDown':
-      items.value.sort((a, b) => b.price - a.price)
-      break
+      return result.sort((a, b) => b.price - a.price)
     case 'name':
-      items.value.sort((a, b) => a.title.localeCompare(b.title))
-      break
+      return result.sort((a, b) => a.title.localeCompare(b.title))
+    default:
+      return result
   }
-}
+})
 
 const addToFavorite = async (item) => {
   try {
@@ -72,7 +76,6 @@ const fetchItems = async () => {
       favoriteId: null,
       addedId: null,
     }))
-    sortedItems()
   } catch (err) {
     console.log(err)
   }
@@ -153,20 +156,13 @@ onMounted(async () => {
   await fetchAdded()
 }) //подгрузка
 
-watch(
-  filter,
-  () => {
-    sortedItems()
-  },
-  { immediate: true },
-  fetchItems,
-)
 provide('openDrawer', openDrawer)
 provide('closeDrawer', closeDrawer)
 provide('addToCart', addToCart) //первое - ключ, второе - значение
 provide('DrawerAddedItems', DrawerAddedItems)
 provide('totalSummCart', totalSummCart)
 provide('removeFromDrawer', removeFromDrawer)
+provide('searchedItems', searchedItems)
 </script>
 <template>
   <Drawer v-if="drawerOpen" :items="items" :AddedItems="AddedItems" />
@@ -185,7 +181,8 @@ provide('removeFromDrawer', removeFromDrawer)
           <div class="relative">
             <img class="absolute left-3 top-3" src="/search.svg" alt="search" />
             <input
-              @input="onChangeSearchInput"
+              v-model="searchQuery"
+              type="text"
               placeholder="Поиск..."
               class="focus:border-gray-400 border rounded-md py-2 pl-10 pr-4 outline-none"
             />
