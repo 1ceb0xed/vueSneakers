@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch, provide, computed } from 'vue'
+import { onMounted, ref, provide, computed } from 'vue'
 import axios from 'axios'
 import Header from './components/Header.vue'
 import CardList from './components/CardList.vue'
@@ -10,13 +10,16 @@ const AddedItems = ref([])
 const drawerOpen = ref(false)
 const filter = ref('name')
 const searchQuery = ref('')
+const isMakeOrder = ref(false)
 
 const searchedItems = computed(() => {
   let result = items.value.filter((item) =>
     item.title.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 
-  switch (filter.value) {
+  switch (
+    filter.value //из условия получаем ответ и сравниваем его с case, default - не совпало ни одно
+  ) {
     case 'priceUp':
       return result.sort((a, b) => a.price - b.price)
     case 'priceDown':
@@ -123,6 +126,7 @@ const openDrawer = () => {
 }
 const closeDrawer = () => {
   drawerOpen.value = false
+  isMakeOrder.value = false
 }
 const DrawerAddedItems = computed(() => {
   return AddedItems.value
@@ -150,6 +154,30 @@ const removeFromDrawer = async (item) => {
   }
 }
 
+const makeOrder = async () => {
+  AddedItems.value.forEach(async (addedItem) => {
+    const itemsId = items.value.find((item) => item.id === addedItem.parentId)
+    if (itemsId) {
+      itemsId.isAdded = false
+    }
+  })
+  const itemsToDelete = [...AddedItems.value]
+  AddedItems.value.splice(0, AddedItems.value.length)
+  isMakeOrder.value = true
+  try {
+    for (const addedItem of itemsToDelete) {
+      try {
+        await axios.delete(`https://a3ca5502346e0c49.mokky.dev/cartadded/${addedItem.id}`)
+        AddedItems.value
+      } catch (err) {
+        console.log(err)
+      }
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 onMounted(async () => {
   await fetchItems()
   await fetchFavorites()
@@ -163,9 +191,10 @@ provide('DrawerAddedItems', DrawerAddedItems)
 provide('totalSummCart', totalSummCart)
 provide('removeFromDrawer', removeFromDrawer)
 provide('searchedItems', searchedItems)
+provide('makeOrder', makeOrder)
 </script>
 <template>
-  <Drawer v-if="drawerOpen" :items="items" :AddedItems="AddedItems" />
+  <Drawer v-if="drawerOpen" :items="items" :AddedItems="AddedItems" :isMakeOrder="isMakeOrder" />
   <div class="w-4/5 m-auto bg-white rounded-xl shadow-xl mt-14">
     <Header />
     <div class="p-10">

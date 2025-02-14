@@ -9,7 +9,7 @@ defineProps({
 const emit = defineEmits(['addToFavorite'])
 </script>
 <template>
-  <div class="grid grid-cols-4 gap-5 ml-5 mr-5">
+  <div class="grid grid-cols-4 gap-5 ml-5 mr-5" v-auto-animate>
     <Card
       v-for="item in searchedItems"
       :key="item.id"
