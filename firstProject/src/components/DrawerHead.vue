@@ -1,7 +1,7 @@
 <script setup>
 import { inject } from 'vue'
 
-const closeDrawer = inject('closeDrawer')
+const { closeDrawer } = inject('Drawer')
 </script>
 <template>
   <div class="flex items-center gap-5 mb-5">

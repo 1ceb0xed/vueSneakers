@@ -4,20 +4,18 @@ import DrawerHead from './DrawerHead.vue'
 import CartItemList from './CartItemList.vue'
 import { inject } from 'vue'
 defineProps({
-  items: Array,
   AddedItems: Array,
-  drawerFilled: Boolean,
   isMakeOrder: Boolean,
 })
+
 const totalSummCart = inject('totalSummCart')
-const closeDrawer = inject('closeDrawer')
-const makeOrder = inject('makeOrder')
+const { closeDrawer, makeOrder } = inject('Drawer')
 </script>
 <template>
   <div @click="closeDrawer" class="fixed top-0 left-0 h-full w-full bg-black z-10 opacity-70"></div>
   <div class="bg-white w-96 h-full overflow-y-auto z-20 fixed right-0 top-0 p-8">
     <DrawerHead />
-    <CartItemList :items="items" :AddedItems="AddedItems" />
+    <CartItemList />
     <div v-if="AddedItems.length > 0" class="flex flex-col gap-2 my-6">
       <div class="flex gap-2">
         <span>Итого:</span>

@@ -184,17 +184,13 @@ onMounted(async () => {
   await fetchAdded()
 }) //подгрузка
 
-provide('openDrawer', openDrawer)
-provide('closeDrawer', closeDrawer)
-provide('addToCart', addToCart) //первое - ключ, второе - значение
-provide('DrawerAddedItems', DrawerAddedItems)
 provide('totalSummCart', totalSummCart)
-provide('removeFromDrawer', removeFromDrawer)
 provide('searchedItems', searchedItems)
-provide('makeOrder', makeOrder)
+provide('addToSomethere', { addToCart, addToFavorite })
+provide('Drawer', { openDrawer, closeDrawer, DrawerAddedItems, removeFromDrawer, makeOrder })
 </script>
 <template>
-  <Drawer v-if="drawerOpen" :items="items" :AddedItems="AddedItems" :isMakeOrder="isMakeOrder" />
+  <Drawer v-if="drawerOpen" :AddedItems="AddedItems" :isMakeOrder="isMakeOrder" />
   <div class="w-4/5 m-auto bg-white rounded-xl shadow-xl mt-14">
     <Header />
     <div class="p-10">
@@ -218,9 +214,9 @@ provide('makeOrder', makeOrder)
           </div>
         </div>
       </div>
-    </div>
-    <div class="mt-10">
-      <CardList :items="items" @addToFavorite="addToFavorite" />
+      <div class="mt-10">
+        <CardList />
+      </div>
     </div>
   </div>
 </template>

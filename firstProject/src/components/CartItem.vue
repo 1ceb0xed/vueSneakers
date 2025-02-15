@@ -5,11 +5,10 @@ defineProps({
   imageUrl: String,
   title: String,
   price: Number,
-  addToCart: Function,
   addedId: Number,
 })
 
-const removeFromDrawer = inject('removeFromDrawer')
+const { removeFromDrawer } = inject('Drawer')
 </script>
 
 <template>

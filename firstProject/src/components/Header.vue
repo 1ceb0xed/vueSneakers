@@ -2,7 +2,7 @@
 <script setup>
 import { inject } from 'vue'
 const totalSummCart = inject('totalSummCart')
-const openDrawer = inject('openDrawer')
+const { openDrawer } = inject('Drawer')
 </script>
 <template>
   <header class="flex justify-between border-b border-slate-100 px-10 py-8">
