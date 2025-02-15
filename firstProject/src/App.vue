@@ -2,11 +2,17 @@
 import { onMounted, ref, provide, computed } from 'vue'
 import axios from 'axios'
 import Header from './components/Header.vue'
-import CardList from './components/CardList.vue'
 import Drawer from './components/Drawer.vue'
+
+onMounted(async () => {
+  await fetchItems()
+  await fetchFavorites()
+  await fetchAdded()
+}) //подгрузка
 
 const items = ref([])
 const AddedItems = ref([])
+const FavoriteItems = ref([])
 const drawerOpen = ref(false)
 const filter = ref('name')
 const searchQuery = ref('')
@@ -48,6 +54,7 @@ const addToFavorite = async (item) => {
   } catch (err) {
     console.log(err)
   }
+  fetchFavorites()
 }
 const addToCart = async (item) => {
   try {
@@ -86,6 +93,7 @@ const fetchItems = async () => {
 const fetchFavorites = async () => {
   try {
     const { data: favorites } = await axios.get('https://a3ca5502346e0c49.mokky.dev/favorites')
+    FavoriteItems.value = favorites
     items.value = items.value.map((item) => {
       const favorite = favorites.find((favorite) => favorite.parentId === item.id)
       if (!favorite) {
@@ -136,6 +144,12 @@ const DrawerAddedItems = computed(() => {
     .filter(Boolean)
 })
 
+const favoriteAddedItems = computed(() => {
+  return FavoriteItems.value.map((favoriteItem) => {
+    return items.value.find((item) => item.id === favoriteItem.parentId)
+  })
+})
+
 const totalSummCart = computed(() => {
   return items.value.filter((item) => item.isAdded).reduce((sum, item) => sum + item.price, 0)
 })
@@ -177,15 +191,10 @@ const makeOrder = async () => {
     console.log(err)
   }
 }
-
-onMounted(async () => {
-  await fetchItems()
-  await fetchFavorites()
-  await fetchAdded()
-}) //подгрузка
-
+provide('refs', { items, AddedItems, drawerOpen, filter, searchQuery, isMakeOrder })
 provide('totalSummCart', totalSummCart)
 provide('searchedItems', searchedItems)
+provide('favoriteAddedItems', favoriteAddedItems)
 provide('addToSomethere', { addToCart, addToFavorite })
 provide('Drawer', { openDrawer, closeDrawer, DrawerAddedItems, removeFromDrawer, makeOrder })
 </script>
@@ -194,29 +203,7 @@ provide('Drawer', { openDrawer, closeDrawer, DrawerAddedItems, removeFromDrawer,
   <div class="w-4/5 m-auto bg-white rounded-xl shadow-xl mt-14">
     <Header />
     <div class="p-10">
-      <div class="flex justify-between items-center">
-        <h2 class="text-3xl font-bold">Все кроссовки</h2>
-
-        <div class="flex gap-4">
-          <select v-model="filter" class="py-2 px-3 border rounded-xl outline-none">
-            <option value="name">По названию</option>
-            <option value="priceUp">По цене(дешевые)</option>
-            <option value="priceDown">По цене(дорогие)</option>
-          </select>
-          <div class="relative">
-            <img class="absolute left-3 top-3" src="/search.svg" alt="search" />
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Поиск..."
-              class="focus:border-gray-400 border rounded-md py-2 pl-10 pr-4 outline-none"
-            />
-          </div>
-        </div>
-      </div>
-      <div class="mt-10">
-        <CardList />
-      </div>
+      <router-view></router-view>
     </div>
   </div>
 </template>
